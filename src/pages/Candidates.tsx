@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { useHistory } from 'umi';
 import type { History } from 'umi';
-import getCandidates from '../../services/candidate';
+import getCandidates from '../services/candidate';
 
 const { Search } = Input;
 const { confirm } = Modal;

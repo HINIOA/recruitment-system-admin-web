@@ -25,13 +25,13 @@ export default [
             routes: [
               {
                 path: '/',
-                redirect: '/workplace',
+                redirect: '/candidates',
               },
               {
-                path: '/workplace',
-                name: '工作台',
-                icon: 'dashboard',
-                component: './Workplace',
+                path: '/candidates',
+                name: '候选人管理',
+                icon: 'contacts',
+                component: './Candidates',
               },
               {
                 path: '/candidate/:id',
@@ -41,8 +41,15 @@ export default [
               {
                 path: '/jobs',
                 name: '职位管理',
-                icon: 'crown',
-                component: './Admin',
+                icon: 'appstore',
+                component: './Jobs',
+                authority: ['admin'],
+              },
+              {
+                path: '/interviewers',
+                name: '面试官管理',
+                icon: 'team',
+                component: './Interviewers',
                 authority: ['admin'],
               },
               {

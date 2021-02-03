@@ -9,10 +9,16 @@ import {
 } from '@ant-design/icons';
 import { useHistory } from 'umi';
 import type { History } from 'umi';
-import getCandidates from '../../services/candidate';
+import { queryStatus, queryCandidates } from '../services/candidates';
+import { getAuthority } from '../utils/authority';
 
 const { Search } = Input;
 const { confirm } = Modal;
+
+interface Tab {
+  key: React.Key;
+  label: React.ReactNode;
+}
 
 interface ActionType {
   reload: (resetPageIndex?: boolean) => void;
@@ -22,6 +28,8 @@ interface ActionType {
   startEditable: (rowKey: React.Key) => boolean;
   cancelEditable: (rowKey: React.Key) => boolean;
 }
+
+const authority = getAuthority();
 
 const renderSearch = (handleSearch) => (
   <div style={{ paddingRight: '1rem' }}>
@@ -72,6 +80,17 @@ const handelClickObsolete = (candidates, tableActions) => {
   });
 };
 
+const hasRights = (candidateStatus: string) => {
+  const isHrHaveRights =
+    authority.includes('admin') &&
+    (candidateStatus === 'firstFiltration' || candidateStatus === 'offerCommunication');
+  const isInterviewerHaveRights =
+    authority.includes('user') &&
+    (candidateStatus === 'departmentFiltration' || candidateStatus === 'interview');
+
+  return isHrHaveRights || isInterviewerHaveRights;
+};
+
 const getColumns = (router: History, includeStatusCol: boolean) => {
   const columns: any[] = [
     {
@@ -119,7 +138,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
           </Button>,
         ];
 
-        if (rowData.status === 'firstFiltration' || rowData.status === 'offerCommunication')
+        if (hasRights(rowData.status))
           optionDoms.push(
             <Button
               key="pass"
@@ -144,7 +163,6 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
       },
     },
   ];
-
   if (!includeStatusCol) return columns;
 
   const statusColumn = {
@@ -189,40 +207,32 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
   return columns;
 };
 
-const Workplace: React.FC = () => {
+const Candidates: React.FC = () => {
   const history = useHistory();
+  const [tabs, setTabs] = useState<Tab[]>([]);
   const [activeTab, setActiveTab] = useState<React.Key>('all');
   const [columns, setColumns] = useState(getColumns(history, true));
   const [searchValue, setSearchValue] = useState('');
   const [selectedRowsData, setSelectedRowsData] = useState<React.Key[]>([]);
   const refTableActions = useRef<ActionType>();
 
-  const tabs = [
-    {
-      key: 'all',
-      label: <span>所有{renderBadge(99, activeTab === 'all')}</span>,
-    },
-    {
-      key: 'firstFiltration',
-      label: <span>初筛{renderBadge(99, activeTab === 'firstFiltration')}</span>,
-    },
-    {
-      key: 'departmentFiltration',
-      label: <span>用人部门筛选{renderBadge(99, activeTab === 'departmentFiltration')}</span>,
-    },
-    {
-      key: 'interview',
-      label: <span>面试{renderBadge(99, activeTab === 'interview')}</span>,
-    },
-    {
-      key: 'offerCommunication',
-      label: <span>offer沟通{renderBadge(99, activeTab === 'offerCommunication')}</span>,
-    },
-    {
-      key: 'toBeHired',
-      label: <span>待入职{renderBadge(99, activeTab === 'toBeHired')}</span>,
-    },
-  ];
+  if (tabs.length === 0)
+    queryStatus().then((status) => {
+      setTabs(
+        status.map(({ key, name, count }) => {
+          return {
+            key,
+            label: (
+              <span>
+                {name}
+                {renderBadge(count, activeTab === key)}
+              </span>
+            ),
+          };
+        }),
+      );
+    });
+
   const rowSelection = {
     onChange: (_, selectedRows: any[]) => {
       setSelectedRowsData(selectedRows);
@@ -237,7 +247,7 @@ const Workplace: React.FC = () => {
     <Table
       columns={columns}
       params={{
-        tab: activeTab,
+        status: activeTab,
         search: searchValue,
       }}
       request={async (
@@ -250,7 +260,7 @@ const Workplace: React.FC = () => {
       ) => {
         // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
         // 如果需要转化参数可以在这里进行修改
-        const { data, success, total } = await getCandidates(params);
+        const { data, success, total } = await queryCandidates(params);
 
         // 返回数据格式：
         // {
@@ -270,7 +280,7 @@ const Workplace: React.FC = () => {
       }}
       actionRef={refTableActions}
       rowSelection={
-        activeTab === 'firstFiltration' || activeTab === 'toBeHired'
+        hasRights(activeTab.toString())
           ? {
               ...rowSelection,
             }
@@ -305,7 +315,6 @@ const Workplace: React.FC = () => {
         </Space>
       )}
       tableAlertOptionRender={() => (
-        // TODO: 实现多选控制
         <Space size={16}>
           <Button
             type="link"
@@ -334,4 +343,4 @@ const Workplace: React.FC = () => {
   );
 };
 
-export default Workplace;
+export default Candidates;

@@ -34,6 +34,11 @@ export default [
                 component: './Workplace',
               },
               {
+                path: '/candidate/:id',
+                hideInMenu: true,
+                component: './CandidateDetail',
+              },
+              {
                 path: '/admin',
                 name: 'admin',
                 icon: 'crown',

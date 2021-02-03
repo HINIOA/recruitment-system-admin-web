@@ -5,7 +5,10 @@ export async function query(): Promise<any> {
 }
 
 export async function queryCurrent(): Promise<any> {
-  return request('/api/currentUser');
+  const userData = localStorage.getItem('user');
+
+  return userData ? JSON.parse(userData) : {};
+  // return request('/api/currentUser');
 }
 
 export async function queryNotices(): Promise<any> {

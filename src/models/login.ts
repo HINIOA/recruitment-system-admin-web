@@ -63,6 +63,7 @@ const Model: LoginModelType = {
 
     logout() {
       const { redirect } = getPageQuery();
+      localStorage.clear();
       // Note: There may be security issues, please note
       if (window.location.pathname !== '/user/login' && !redirect) {
         history.replace({
@@ -78,6 +79,14 @@ const Model: LoginModelType = {
   reducers: {
     changeLoginStatus(state, { payload }) {
       setAuthority(payload.currentAuthority);
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          name: 'Serati Ma',
+          avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+          userid: '00000001',
+        }),
+      );
       return {
         ...state,
         status: payload.status,

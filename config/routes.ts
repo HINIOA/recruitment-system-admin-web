@@ -39,20 +39,11 @@ export default [
                 component: './CandidateDetail',
               },
               {
-                path: '/admin',
-                name: 'admin',
+                path: '/jobs',
+                name: '职位管理',
                 icon: 'crown',
                 component: './Admin',
                 authority: ['admin'],
-                routes: [
-                  {
-                    path: '/admin/sub-page',
-                    name: 'sub-page',
-                    icon: 'smile',
-                    component: './Workplace',
-                    authority: ['admin'],
-                  },
-                ],
               },
               {
                 component: './404',

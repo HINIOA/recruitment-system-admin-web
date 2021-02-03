@@ -89,20 +89,28 @@ export default {
   ],
   'POST /api/login/account': async (req: Request, res: Response) => {
     const { password, userName, type } = req.body;
+    const userData = {
+      name: 'Serati Ma',
+      avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+      userid: '00000001',
+    };
+
     await waitTime(2000);
-    if (password === 'ant.design' && userName === 'admin') {
+    if (password === '123456' && userName === 'admin') {
       res.send({
         status: 'ok',
         type,
         currentAuthority: 'admin',
+        userData,
       });
       return;
     }
-    if (password === 'ant.design' && userName === 'user') {
+    if (password === '123456' && userName === 'user') {
       res.send({
         status: 'ok',
         type,
         currentAuthority: 'user',
+        userData,
       });
       return;
     }

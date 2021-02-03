@@ -70,7 +70,6 @@ const headerContentRender = (
 );
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
-  console.log(props);
   const {
     dispatch,
     children,

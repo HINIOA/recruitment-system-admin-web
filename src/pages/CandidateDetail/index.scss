@@ -1,0 +1,25 @@
+.container {
+  margin-top: 1rem;
+  height: calc(100vh - 200px);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.steps {
+  flex: 1;
+}
+
+.content {
+  height: 100%;
+  overflow: auto;
+}
+
+.resumeContainer {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 1rem;
+}

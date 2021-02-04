@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { useHistory } from 'umi';
 import type { History } from 'umi';
-import { queryStatus, queryCandidates } from '../services/candidates';
+import { queryStatus, queryCandidates } from '../services/candidate';
 import { getAuthority } from '../utils/authority';
 
 const { Search } = Input;
@@ -80,6 +80,7 @@ const handelClickObsolete = (candidates, tableActions) => {
   });
 };
 
+// 判断当前用户是否有权限操作该候选人
 const hasRights = (candidateStatus: string) => {
   const isHrHaveRights =
     authority.includes('admin') &&
@@ -138,7 +139,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
           </Button>,
         ];
 
-        if (hasRights(rowData.status))
+        if (hasRights(rowData.steps))
           optionDoms.push(
             <Button
               key="pass"
@@ -158,14 +159,13 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
               淘汰
             </Button>,
           );
-
         return optionDoms;
       },
     },
   ];
   if (!includeStatusCol) return columns;
 
-  const statusColumn = {
+  const stepColumn = {
     title: '状态',
     key: 'status',
     render: (_, rowData) => {
@@ -190,8 +190,12 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
           name: '待入职',
           color: 'green',
         },
+        obsolete: {
+          name: '已淘汰',
+          color: 'red',
+        },
       };
-      const { name, color } = map[rowData.status];
+      const { name, color } = rowData.status === 'obsolete' ? map.obsolete : map[rowData.step];
 
       return (
         <Space>
@@ -203,7 +207,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
     },
   };
 
-  columns.splice(3, 0, statusColumn);
+  columns.splice(3, 0, stepColumn);
   return columns;
 };
 
@@ -261,6 +265,9 @@ const Candidates: React.FC = () => {
         // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
         // 如果需要转化参数可以在这里进行修改
         const { data, success, total } = await queryCandidates(params);
+        const tableData = data.map((item) => {
+          return { ...item, key: item.id };
+        });
 
         // 返回数据格式：
         // {
@@ -273,7 +280,7 @@ const Candidates: React.FC = () => {
         // };
 
         return {
-          data,
+          data: tableData,
           success,
           total,
         };

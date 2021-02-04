@@ -111,6 +111,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     <ProLayout
       {...props}
       {...settings}
+      fixSiderbar
       collapsed={collapsed}
       onCollapse={handleMenuCollapse}
       onMenuHeaderClick={() => history.push('/')}

@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { useHistory } from 'umi';
 import type { History } from 'umi';
-import { queryStatus, queryCandidates } from '../services/candidate';
+import { queryCandidates, passCandidates, obsoleteCandidates } from '../services/candidate';
 // import { getAuthority } from '../utils/authority';
 
 const { Search } = Input;
@@ -31,9 +31,16 @@ interface ActionType {
 
 // const authority = getAuthority();
 
-const renderSearch = (handleSearch) => (
+const renderSearch = (handleSearch, handleSearchChange) => (
   <div style={{ paddingRight: '1rem' }}>
-    <Search placeholder="搜索候选人" onSearch={handleSearch} size="large" enterButton />
+    <Search
+      placeholder="搜索候选人"
+      onSearch={handleSearch}
+      onChange={handleSearchChange}
+      size="large"
+      allowClear
+      enterButton
+    />
   </div>
 );
 
@@ -58,9 +65,11 @@ const handelClickPass = (candidates, tableActions) => {
     okText: '是',
     cancelText: '否',
     onOk() {
-      // TODO：发送请求
-      console.log('pass', candidates);
-      tableActions.reload();
+      const ids = candidates.map((item) => item.id);
+
+      passCandidates(ids).then((res) => {
+        if (res.success) tableActions.reload();
+      });
     },
   });
 };
@@ -73,16 +82,17 @@ const handelClickObsolete = (candidates, tableActions) => {
     okType: 'danger',
     cancelText: '否',
     onOk() {
-      // TODO：发送请求
-      console.log('obsolete', candidates);
-      tableActions.reload();
+      const ids = candidates.map((item) => item.id);
+
+      obsoleteCandidates(ids).then((res) => {
+        if (res.success) tableActions.reload();
+      });
     },
   });
 };
 
-// 判断当前用户是否有权限操作该候选人
-const hasRights = (candidateStatus: string) => {
-  console.log(candidateStatus);
+// TODO:  判断当前用户是否有权限操作该候选人
+const hasRights = (candidateStep: string, candidateStatus: string) => {
   // const isHrHaveRights =
   //   authority.includes('admin') &&
   //   (candidateStatus === 'firstFiltration' || candidateStatus === 'offerCommunication');
@@ -91,7 +101,7 @@ const hasRights = (candidateStatus: string) => {
   //   (candidateStatus === 'departmentFiltration' || candidateStatus === 'interview');
 
   // return isHrHaveRights || isInterviewerHaveRights;
-  return true;
+  return candidateStatus !== 'obsolete';
 };
 
 const getColumns = (router: History, includeStatusCol: boolean) => {
@@ -142,7 +152,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
           </Button>,
         ];
 
-        if (hasRights(rowData.steps))
+        if (hasRights(rowData.steps, rowData.status))
           optionDoms.push(
             <Button
               key="pass"
@@ -224,31 +234,34 @@ const Candidates: React.FC = () => {
   const [selectedRowsData, setSelectedRowsData] = useState<React.Key[]>([]);
   const refTableActions = useRef<ActionType>();
 
-  if (tabs.length === 0)
-    queryStatus().then((status) => {
-      setTabs(
-        status.map(({ key, name, count }) => {
-          return {
-            key,
-            label: (
-              <span>
-                {name}
-                {renderBadge(count, activeTab === key)}
-              </span>
-            ),
-          };
-        }),
-      );
-    });
-
   const rowSelection = {
     onChange: (_, selectedRows: any[]) => {
       setSelectedRowsData(selectedRows);
     },
   };
 
+  const generateAndSetTabs = (status) => {
+    setTabs(
+      status.map(({ key, name, count }) => {
+        return {
+          key,
+          label: (
+            <span>
+              {name}
+              {renderBadge(count, activeTab === key)}
+            </span>
+          ),
+        };
+      }),
+    );
+  };
+
   const handleSearch = (value: string) => {
     setSearchValue(value);
+  };
+
+  const handleSearchChange = (e) => {
+    if (!e.target.value) setSearchValue('');
   };
 
   return (
@@ -268,10 +281,12 @@ const Candidates: React.FC = () => {
       ) => {
         // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
         // 如果需要转化参数可以在这里进行修改
-        const { data, success, total } = await queryCandidates(params);
-        const tableData = data.map((item) => {
+        const { tableData, status, success, total } = await queryCandidates(params);
+        const data = tableData.map((item) => {
           return { ...item, key: item.id };
         });
+
+        generateAndSetTabs(status);
 
         // 返回数据格式：
         // {
@@ -284,14 +299,14 @@ const Candidates: React.FC = () => {
         // };
 
         return {
-          data: tableData,
+          data,
           success,
           total,
         };
       }}
       actionRef={refTableActions}
       rowSelection={
-        hasRights(activeTab.toString())
+        activeTab.toString() !== 'all' && activeTab.toString() !== 'obsolete'
           ? {
               ...rowSelection,
             }
@@ -310,10 +325,9 @@ const Candidates: React.FC = () => {
               setColumns(getColumns(history, true));
             }
             setActiveTab(key as string);
-            setSearchValue(key as string);
           },
         },
-        actions: [renderSearch(handleSearch)],
+        actions: [renderSearch(handleSearch, handleSearchChange)],
       }}
       tableAlertRender={({ selectedRowKeys, onCleanSelected }) => (
         <Space size={24}>

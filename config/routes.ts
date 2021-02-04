@@ -45,13 +45,13 @@ export default [
                 component: './Jobs',
                 authority: ['admin'],
               },
-              {
-                path: '/interviewers',
-                name: '面试官管理',
-                icon: 'team',
-                component: './Interviewers',
-                authority: ['admin'],
-              },
+              // {
+              //   path: '/interviewers',
+              //   name: '面试官管理',
+              //   icon: 'team',
+              //   component: './Interviewers',
+              //   authority: ['admin'],
+              // },
               {
                 component: './404',
               },

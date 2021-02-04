@@ -82,10 +82,12 @@ export default {
       interview: 0,
       offerCommunication: 0,
       toBeHired: 0,
+      obsolete: 0,
     };
 
     dbData.forEach((item) => {
-      statusCounts[item.status]++;
+      if (item.status === 'obsolete') statusCounts.obsolete++;
+      else statusCounts[item.step]++;
     });
 
     res.send([
@@ -119,12 +121,21 @@ export default {
         name: '待入职',
         count: statusCounts.toBeHired,
       },
+      {
+        key: 'obsolete',
+        name: '已淘汰',
+        count: statusCounts.obsolete,
+      },
     ]);
   },
   'GET /api/candidates': async (req: Request, res: Response) => {
-    const { status } = req.query;
+    const { tab } = req.query;
     const data =
-      !status || status === 'all' ? dbData : dbData.filter((item) => item.status === status);
+      !tab || tab === 'all'
+        ? dbData
+        : tab === 'obsolete'
+        ? dbData.filter((item) => item.status === 'obsolete')
+        : dbData.filter((item) => item.step === tab);
 
     res.send({
       data,

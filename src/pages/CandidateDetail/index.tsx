@@ -5,7 +5,7 @@ import Card from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import styles from './index.scss';
-import { queryCandidate, updateCandidate } from '../../services/candidate';
+import { queryCandidate, passCandidates, obsoleteCandidates } from '../../services/candidate';
 import type { Candidate } from '../../models/candidate';
 
 const { Step } = Steps;
@@ -39,14 +39,11 @@ const CandidateDetail: React.FC = () => {
       okText: '是',
       cancelText: '否',
       onOk() {
-        const newCandidate = { ...candidate };
-        newCandidate.step = steps[curStep + 1];
-
-        updateCandidate(newCandidate).then((response) => {
+        passCandidates([candidate.id]).then((response) => {
           const { data } = response;
 
-          setCandidate(data);
-          setCurStep(steps.indexOf(data.step));
+          setCandidate(data[0]);
+          setCurStep(steps.indexOf(data[0].step));
         });
       },
     });
@@ -60,13 +57,10 @@ const CandidateDetail: React.FC = () => {
       okType: 'danger',
       cancelText: '否',
       onOk() {
-        const newCandidate = { ...candidate };
-        newCandidate.status = 'obsolete';
-
-        updateCandidate(newCandidate).then((response) => {
+        obsoleteCandidates([candidate.id]).then((response) => {
           const { data } = response;
 
-          setCandidate(data);
+          setCandidate(data[0]);
         });
       },
     });

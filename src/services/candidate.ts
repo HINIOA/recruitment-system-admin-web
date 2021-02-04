@@ -12,15 +12,6 @@ export async function queryCandidate(id: string) {
   return request(`/api/candidate?id=${id}`);
 }
 
-export async function updateCandidate(candidates) {
-  return request(`/api/candidate/update`, {
-    method: 'POST',
-    data: {
-      candidates,
-    },
-  });
-}
-
 export async function passCandidates(ids: string[]) {
   return request('/api/candidate/pass', {
     method: 'POST',

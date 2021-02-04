@@ -10,7 +10,7 @@ import {
 import { useHistory } from 'umi';
 import type { History } from 'umi';
 import { queryStatus, queryCandidates } from '../services/candidate';
-import { getAuthority } from '../utils/authority';
+// import { getAuthority } from '../utils/authority';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -29,7 +29,7 @@ interface ActionType {
   cancelEditable: (rowKey: React.Key) => boolean;
 }
 
-const authority = getAuthority();
+// const authority = getAuthority();
 
 const renderSearch = (handleSearch) => (
   <div style={{ paddingRight: '1rem' }}>
@@ -82,14 +82,16 @@ const handelClickObsolete = (candidates, tableActions) => {
 
 // 判断当前用户是否有权限操作该候选人
 const hasRights = (candidateStatus: string) => {
-  const isHrHaveRights =
-    authority.includes('admin') &&
-    (candidateStatus === 'firstFiltration' || candidateStatus === 'offerCommunication');
-  const isInterviewerHaveRights =
-    authority.includes('user') &&
-    (candidateStatus === 'departmentFiltration' || candidateStatus === 'interview');
+  console.log(candidateStatus);
+  // const isHrHaveRights =
+  //   authority.includes('admin') &&
+  //   (candidateStatus === 'firstFiltration' || candidateStatus === 'offerCommunication');
+  // const isInterviewerHaveRights =
+  //   authority.includes('user') &&
+  //   (candidateStatus === 'departmentFiltration' || candidateStatus === 'interview');
 
-  return isHrHaveRights || isInterviewerHaveRights;
+  // return isHrHaveRights || isInterviewerHaveRights;
+  return true;
 };
 
 const getColumns = (router: History, includeStatusCol: boolean) => {
@@ -128,6 +130,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
     {
       title: '操作',
       valueType: 'option',
+      fixed: 'right',
       render: (_, rowData, __, action) => {
         const optionDoms = [
           <Button
@@ -159,6 +162,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
               淘汰
             </Button>,
           );
+
         return optionDoms;
       },
     },
@@ -251,7 +255,7 @@ const Candidates: React.FC = () => {
     <Table
       columns={columns}
       params={{
-        status: activeTab,
+        tab: activeTab,
         search: searchValue,
       }}
       request={async (

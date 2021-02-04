@@ -5,7 +5,7 @@ export async function queryStatus() {
 }
 
 export async function queryCandidates(params) {
-  return request(`/api/candidates?status=${params.status}`);
+  return request(`/api/candidates?tab=${params.tab}`);
 }
 
 export async function queryCandidate(id: string) {

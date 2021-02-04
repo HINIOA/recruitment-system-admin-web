@@ -2,54 +2,74 @@ import { Request, Response } from 'express';
 
 const dbData = [
   {
-    key: '1',
+    id: '1',
     name: '李春花',
     job: '前端开发工程师',
     education: '华南农业大学（本科）',
     sex: '女',
     age: 32,
+    phone: '12345678910',
+    email: '123456@qq.com',
     time: new Date(),
-    status: 'firstFiltration',
+    status: 'processing',
+    step: 'firstFiltration',
+    resumeUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
   },
   {
-    key: '2',
+    id: '2',
     name: '张三',
     job: '后端开发工程师',
     education: '华南农业大学（硕士）',
     sex: '男',
     age: 42,
+    phone: '12345678910',
+    email: '123456@qq.com',
     time: new Date(),
-    status: 'departmentFiltration',
+    status: 'processing',
+    step: 'departmentFiltration',
+    resumeUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
   },
   {
-    key: '3',
+    id: '3',
     name: '张三',
     job: '后端开发工程师',
     education: '华南农业大学（硕士）',
     sex: '男',
     age: 42,
+    phone: '12345678910',
+    email: '123456@qq.com',
     time: new Date(),
-    status: 'interview',
+    status: 'obsolete',
+    step: 'interview',
+    resumeUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
   },
   {
-    key: '4',
+    id: '4',
     name: '张三',
     job: '后端开发工程师',
     education: '华南农业大学（硕士）',
     sex: '男',
     age: 42,
+    phone: '12345678910',
+    email: '123456@qq.com',
     time: new Date(),
-    status: 'offerCommunication',
+    status: 'processing',
+    step: 'offerCommunication',
+    resumeUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
   },
   {
-    key: '5',
+    id: '5',
     name: '张三',
     job: '后端开发工程师',
     education: '华南农业大学（硕士）',
     sex: '男',
     age: 42,
+    phone: '12345678910',
+    email: '123456@qq.com',
     time: new Date(),
-    status: 'toBeHired',
+    status: 'pass',
+    step: 'toBeHired',
+    resumeUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
   },
 ];
 
@@ -110,6 +130,35 @@ export default {
       data,
       success: true,
       total: data.length,
+    });
+  },
+  'GET /api/candidate': async (req: Request, res: Response) => {
+    const { id } = req.query;
+    const data = dbData.find((item) => item.id === id);
+
+    res.send(
+      data
+        ? {
+            data,
+            isSuccess: true,
+          }
+        : {
+            data: {},
+            isSuccess: false,
+          },
+    );
+  },
+  'POST /api/candidate/update': async (req: Request, res: Response) => {
+    const { id } = req.query;
+    const { candidate: data } = req.body;
+    const candidate = dbData.find((item) => item.id === id);
+
+    Object.keys(data).forEach((key) => {
+      candidate[key] = data[key];
+    });
+
+    res.send({
+      data: candidate,
     });
   },
 };

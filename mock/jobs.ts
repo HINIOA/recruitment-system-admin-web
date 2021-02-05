@@ -72,8 +72,8 @@ export default {
 
     if (id) {
       const index = dbData.jobs.findIndex((job) => job.id === id);
-      dbData.jobs[index] = job;
-      // console.log(job, dbData.jobs);
+      if (index > -1) dbData.jobs[index] = job;
+      console.log(job, dbData.jobs);
     } else {
       dbData.jobs.push({
         id: Date.now().toString(),

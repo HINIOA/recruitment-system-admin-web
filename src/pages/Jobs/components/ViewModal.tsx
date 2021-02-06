@@ -26,7 +26,7 @@ const ViewModal: React.FC<JobViewModalProps> = (props) => {
         <Descriptions.Item label="部门">{job.department}</Descriptions.Item>
         <Descriptions.Item label="类型">{job.types.join('｜')}</Descriptions.Item>
         <Descriptions.Item label="工作地点">{job.location}</Descriptions.Item>
-        <Descriptions.Item label="待招人数">{job.number}</Descriptions.Item>
+        <Descriptions.Item label="待招人数">{job.recruitNumber}</Descriptions.Item>
         <Descriptions.Item label="创建时间">
           {new Date(job.c_time).toLocaleDateString()}
         </Descriptions.Item>

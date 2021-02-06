@@ -45,20 +45,20 @@ const EditDrawer: React.FC<JobEditDrawer> = (props) => {
           width="sm"
           options={[
             {
-              value: '全职',
-              label: '全职',
-            },
-            {
-              value: '兼职',
-              label: '兼职',
-            },
-            {
               value: '研发类',
               label: '研发类',
             },
             {
               value: '职能类',
               label: '职能类',
+            },
+            {
+              value: '全职',
+              label: '全职',
+            },
+            {
+              value: '实习',
+              label: '实习',
             },
           ]}
           mode="multiple"
@@ -118,7 +118,7 @@ const EditDrawer: React.FC<JobEditDrawer> = (props) => {
         />
         <ProFormDigit
           width="sm"
-          name="number"
+          name="recruitNumber"
           min={1}
           label="待招人数"
           rules={[{ required: true, message: '请输入待招人数' }]}

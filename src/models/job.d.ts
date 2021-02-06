@@ -7,5 +7,5 @@ export interface Job {
   p_time?: Date;
   location: string;
   types: string[];
-  number: number;
+  recruitNumber: number;
 }

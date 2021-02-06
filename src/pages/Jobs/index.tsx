@@ -41,10 +41,10 @@ const handleClickDelete = (job: Job, action) => {
     okType: 'danger',
     cancelText: '否',
     onOk: async () => {
-      const response = await deleteJob(job.id);
+      const { isSuccess, message: messageText } = await deleteJob(job.id);
 
-      if (response.success) {
-        message.success('删除成功');
+      if (isSuccess) {
+        message.success(messageText);
         action.reload();
       }
     },
@@ -86,7 +86,7 @@ const columns: ProColumns[] = [
     title: '类型',
     key: 'types',
     dataIndex: 'types',
-    render: (_, rowData) => <span>{rowData.types.join('｜')}</span>,
+    render: (_, rowData) => <span>{rowData.types ? rowData.types.join('｜') : ''}</span>,
     renderFormItem: (item, { type, defaultRender, ...rest }) => {
       if (type === 'form') {
         return null;
@@ -105,8 +105,8 @@ const columns: ProColumns[] = [
   },
   {
     title: '待招人数',
-    key: 'number',
-    dataIndex: 'number',
+    key: 'recruitNumber',
+    dataIndex: 'recruitNumber',
     search: false,
   },
   {
@@ -171,11 +171,12 @@ const renderFormDrawer = ({ job, formRef, visible, setVisible, tableActionRef })
           });
         }
 
-        const response = formType === 'create' ? await addJob(newJob) : await updateJob(newJob);
+        const { isSuccess, message: messageText } =
+          formType === 'create' ? await addJob(newJob) : await updateJob(newJob);
 
-        if (response.success) {
+        if (isSuccess) {
           tableActionRef.current.reload();
-          message.success(`${formType}成功`);
+          message.success(messageText);
           return true;
         }
 

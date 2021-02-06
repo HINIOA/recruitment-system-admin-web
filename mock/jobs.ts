@@ -46,53 +46,46 @@ const dbData = {
 };
 
 export default {
-  'GET /api/jobs': async (req: Request, res: Response) => {
-    const { page, name, department, types } = req.query;
-    const filtratedJobs = dbData.jobs.filter((job) => {
-      if (name && job.name !== name) return false;
-      if (department && job.department !== department) return false;
-      if (types) {
-        const typeArr = (types as string).split(',');
-
-        for (let i = 0; i < typeArr.length; i++) {
-          if (!job.types.includes(typeArr[i])) return false;
-        }
-      }
-
-      return true;
-    });
-
-    res.send({
-      data: filtratedJobs,
-    });
-  },
-  'POST /api/job': async (req: Request, res: Response) => {
-    const { id } = req.query;
-    const { job } = req.body;
-
-    if (id) {
-      const index = dbData.jobs.findIndex((job) => job.id === id);
-      if (index > -1) dbData.jobs[index] = job;
-      console.log(job, dbData.jobs);
-    } else {
-      dbData.jobs.push({
-        id: Date.now().toString(),
-        ...job,
-      });
-    }
-
-    res.send({
-      success: true,
-    });
-  },
-  'DELETE /api/job': async (req: Request, res: Response) => {
-    const { id } = req.body;
-    const index = dbData.jobs.findIndex((job) => job.id === id);
-
-    dbData.jobs.splice(index, 1);
-
-    res.send({
-      success: true,
-    });
-  },
+  // 'GET /api/job': async (req: Request, res: Response) => {
+  //   const { page, name, department, types } = req.query;
+  //   const filtratedJobs = dbData.jobs.filter((job) => {
+  //     if (name && job.name !== name) return false;
+  //     if (department && job.department !== department) return false;
+  //     if (types) {
+  //       const typeArr = (types as string).split(',');
+  //       for (let i = 0; i < typeArr.length; i++) {
+  //         if (!job.types.includes(typeArr[i])) return false;
+  //       }
+  //     }
+  //     return true;
+  //   });
+  //   res.send({
+  //     data: filtratedJobs,
+  //   });
+  // },
+  // 'POST /api/job': async (req: Request, res: Response) => {
+  //   const { id } = req.query;
+  //   const { job } = req.body;
+  //   if (id) {
+  //     const index = dbData.jobs.findIndex((job) => job.id === id);
+  //     if (index > -1) dbData.jobs[index] = job;
+  //     console.log(job, dbData.jobs);
+  //   } else {
+  //     dbData.jobs.push({
+  //       id: Date.now().toString(),
+  //       ...job,
+  //     });
+  //   }
+  //   res.send({
+  //     success: true,
+  //   });
+  // },
+  // 'DELETE /api/job': async (req: Request, res: Response) => {
+  //   const { id } = req.body;
+  //   const index = dbData.jobs.findIndex((job) => job.id === id);
+  //   dbData.jobs.splice(index, 1);
+  //   res.send({
+  //     success: true,
+  //   });
+  // },
 };

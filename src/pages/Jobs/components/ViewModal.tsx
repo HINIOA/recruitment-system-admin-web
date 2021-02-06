@@ -30,7 +30,11 @@ const ViewModal: React.FC<JobViewModalProps> = (props) => {
         <Descriptions.Item label="创建时间">
           {new Date(job.c_time).toLocaleDateString()}
         </Descriptions.Item>
-        <Descriptions.Item label="职位描述">{job.desc}</Descriptions.Item>
+        <Descriptions.Item label="职位描述">
+          {job.desc.split('|').map((p) => (
+            <p>{p === ' ' ? '&nbsp;' : p}</p>
+          ))}
+        </Descriptions.Item>
       </Descriptions>
     </Modal>
   ) : null;

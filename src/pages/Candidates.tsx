@@ -10,7 +10,7 @@ import {
 import { useHistory } from 'umi';
 import type { History } from 'umi';
 import { queryCandidates, passCandidates, obsoleteCandidates } from '../services/candidate';
-// import { getAuthority } from '../utils/authority';
+import { formatCandidate } from '../utils/dataFormater';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -28,35 +28,6 @@ interface ActionType {
   startEditable: (rowKey: React.Key) => boolean;
   cancelEditable: (rowKey: React.Key) => boolean;
 }
-
-// const authority = getAuthority();
-
-const renderSearch = (handleSearch, handleSearchChange) => (
-  <div style={{ paddingRight: '1rem' }}>
-    <Search
-      placeholder="搜索候选人"
-      onSearch={handleSearch}
-      onChange={handleSearchChange}
-      size="large"
-      allowClear
-      enterButton
-    />
-  </div>
-);
-
-const renderBadge = (count: number, active = false) => {
-  return (
-    <Badge
-      count={count}
-      style={{
-        marginTop: -2,
-        marginLeft: 4,
-        color: active ? '#1890FF' : '#999',
-        backgroundColor: active ? '#E6F7FF' : '#eee',
-      }}
-    />
-  );
-};
 
 const handelClickPass = (candidates, tableActions) => {
   confirm({
@@ -225,6 +196,33 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
   return columns;
 };
 
+const renderSearch = (handleSearch, handleSearchChange) => (
+  <div style={{ paddingRight: '1rem' }}>
+    <Search
+      placeholder="搜索候选人"
+      onSearch={handleSearch}
+      onChange={handleSearchChange}
+      size="large"
+      allowClear
+      enterButton
+    />
+  </div>
+);
+
+const renderBadge = (count: number, active = false) => {
+  return (
+    <Badge
+      count={count}
+      style={{
+        marginTop: -2,
+        marginLeft: 4,
+        color: active ? '#1890FF' : '#999',
+        backgroundColor: active ? '#E6F7FF' : '#eee',
+      }}
+    />
+  );
+};
+
 const Candidates: React.FC = () => {
   const history = useHistory();
   const [tabs, setTabs] = useState<Tab[]>([]);
@@ -240,9 +238,9 @@ const Candidates: React.FC = () => {
     },
   };
 
-  const generateAndSetTabs = (status) => {
+  const generateAndSetTabs = (tabsData) => {
     setTabs(
-      status.map(({ key, name, count }) => {
+      tabsData.map(({ key, name, count }) => {
         return {
           key,
           label: (
@@ -269,7 +267,7 @@ const Candidates: React.FC = () => {
       columns={columns}
       params={{
         tab: activeTab,
-        search: searchValue,
+        name: searchValue,
       }}
       request={async (
         // 第一个参数 params 查询表单和 params 参数的结合
@@ -281,12 +279,11 @@ const Candidates: React.FC = () => {
       ) => {
         // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
         // 如果需要转化参数可以在这里进行修改
-        const { tableData, status, success, total } = await queryCandidates(params);
-        const data = tableData.map((item) => {
-          return { ...item, key: item.id };
-        });
+        const response = await queryCandidates(params);
+        const { tableData, tabs: tabsData, success } = response;
+        const data = [...tableData].map((candidate) => formatCandidate(candidate));
 
-        generateAndSetTabs(status);
+        generateAndSetTabs(tabsData);
 
         // 返回数据格式：
         // {
@@ -301,7 +298,7 @@ const Candidates: React.FC = () => {
         return {
           data,
           success,
-          total,
+          total: tableData.length,
         };
       }}
       actionRef={refTableActions}

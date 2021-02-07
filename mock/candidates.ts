@@ -159,105 +159,89 @@ const getStatus = () => {
 };
 
 export default {
-  'GET /api/status': async (_, res: Response) => res.send(getStatus()),
-  'GET /api/candidates': async (req: Request, res: Response) => {
-    const { tab, search } = req.query;
-    let tableData = search
-      ? dbData.candidates.filter((item) => item.name.includes(search as string))
-      : [...dbData.candidates];
-
-    if (tab && tab !== 'all') {
-      tableData = tableData.filter((item) => {
-        return tab === 'obsolete' ? item.status === 'obsolete' : item.step === tab;
-      });
-    }
-
-    res.send({
-      success: true,
-      status: getStatus(),
-      tableData,
-      total: tableData.length,
-    });
-  },
-  'GET /api/candidate': async (req: Request, res: Response) => {
-    const { id } = req.query;
-    const data = dbData.candidates.find((item) => item.id === id);
-
-    res.send(
-      data
-        ? {
-            data,
-            isSuccess: true,
-          }
-        : {
-            data: {},
-            isSuccess: false,
-          },
-    );
-  },
-  'POST /api/candidate/update': async (req: Request, res: Response) => {
-    const { candidates } = req.body;
-    const candidateMap = {};
-    const dbCandidates = dbData.candidates;
-    const newCandidates = [];
-
-    candidates.forEach((item) => {
-      candidateMap[item.id] = item;
-    });
-    dbCandidates.forEach((item) => {
-      const newCandidate = candidateMap[item.id];
-
-      if (newCandidate) newCandidates.push(newCandidate);
-      else newCandidates.push(item);
-    });
-
-    dbData.candidates = [...newCandidates];
-
-    res.send({
-      success: true,
-      data: candidates,
-    });
-  },
-  'POST /api/candidate/pass': async (req: Request, res: Response) => {
-    const { ids } = req.body;
-    const data = [];
-
-    dbData.candidates = dbData.candidates.map((item) => {
-      const candidate = { ...item };
-
-      if (ids.includes(item.id)) {
-        const stepIdx = dbData.steps.indexOf(candidate.step);
-
-        candidate.step = dbData.steps[stepIdx + 1];
-        data.push(candidate);
-      }
-
-      return candidate;
-    });
-
-    res.send({
-      success: true,
-      data,
-    });
-  },
-  'POST /api/candidate/obsolete': async (req: Request, res: Response) => {
-    const { ids } = req.body;
-    const data = [];
-
-    dbData.candidates = dbData.candidates.map((item) => {
-      const candidate = { ...item };
-
-      if (ids.includes(item.id)) {
-        candidate.status = 'obsolete';
-        data.push({ ...candidate });
-      }
-
-      return candidate;
-    });
-
-    res.send({
-      success: true,
-      data,
-    });
-  },
+  // 'GET /api/status': async (_, res: Response) => res.send(getStatus()),
+  // 'GET /api/candidates': async (req: Request, res: Response) => {
+  //   const { tab, search } = req.query;
+  //   let tableData = search
+  //     ? dbData.candidates.filter((item) => item.name.includes(search as string))
+  //     : [...dbData.candidates];
+  //   if (tab && tab !== 'all') {
+  //     tableData = tableData.filter((item) => {
+  //       return tab === 'obsolete' ? item.status === 'obsolete' : item.step === tab;
+  //     });
+  //   }
+  //   res.send({
+  //     success: true,
+  //     status: getStatus(),
+  //     tableData,
+  //     total: tableData.length,
+  //   });
+  // },
+  // 'GET /api/candidate': async (req: Request, res: Response) => {
+  //   const { id } = req.query;
+  //   const data = dbData.candidates.find((item) => item.id === id);
+  //   res.send(
+  //     data
+  //       ? {
+  //           data,
+  //           isSuccess: true,
+  //         }
+  //       : {
+  //           data: {},
+  //           isSuccess: false,
+  //         },
+  //   );
+  // },
+  // 'POST /api/candidate/update': async (req: Request, res: Response) => {
+  //   const { candidates } = req.body;
+  //   const candidateMap = {};
+  //   const dbCandidates = dbData.candidates;
+  //   const newCandidates = [];
+  //   candidates.forEach((item) => {
+  //     candidateMap[item.id] = item;
+  //   });
+  //   dbCandidates.forEach((item) => {
+  //     const newCandidate = candidateMap[item.id];
+  //     if (newCandidate) newCandidates.push(newCandidate);
+  //     else newCandidates.push(item);
+  //   });
+  //   dbData.candidates = [...newCandidates];
+  //   res.send({
+  //     success: true,
+  //     data: candidates,
+  //   });
+  // },
+  // 'POST /api/candidate/pass': async (req: Request, res: Response) => {
+  //   const { ids } = req.body;
+  //   const data = [];
+  //   dbData.candidates = dbData.candidates.map((item) => {
+  //     const candidate = { ...item };
+  //     if (ids.includes(item.id)) {
+  //       const stepIdx = dbData.steps.indexOf(candidate.step);
+  //       candidate.step = dbData.steps[stepIdx + 1];
+  //       data.push(candidate);
+  //     }
+  //     return candidate;
+  //   });
+  //   res.send({
+  //     success: true,
+  //     data,
+  //   });
+  // },
+  // 'POST /api/candidate/obsolete': async (req: Request, res: Response) => {
+  //   const { ids } = req.body;
+  //   const data = [];
+  //   dbData.candidates = dbData.candidates.map((item) => {
+  //     const candidate = { ...item };
+  //     if (ids.includes(item.id)) {
+  //       candidate.status = 'obsolete';
+  //       data.push({ ...candidate });
+  //     }
+  //     return candidate;
+  //   });
+  //   res.send({
+  //     success: true,
+  //     data,
+  //   });
+  // },
 };

@@ -355,6 +355,7 @@ const Candidates: React.FC = () => {
       )}
       scroll={{ x: 1300 }}
       pagination={{
+        defaultPageSize: 10,
         position: ['bottomCenter'],
       }}
       options={false}

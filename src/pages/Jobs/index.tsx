@@ -236,6 +236,7 @@ const Jobs: React.FC = () => {
           </Button>,
         ]}
         pagination={{
+          defaultPageSize: 10,
           position: ['bottomCenter'],
         }}
         dateFormatter="string"

@@ -10,7 +10,7 @@ import {
 import { useHistory } from 'umi';
 import type { History } from 'umi';
 import { queryCandidates, passCandidates, obsoleteCandidates } from '../services/candidate';
-import { formatCandidate } from '../utils/dataFormater';
+import { Link, TabKey } from '@/models/candidate';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -104,8 +104,8 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
     },
     {
       title: '投递时间',
-      dataIndex: 'time',
-      key: 'time',
+      dataIndex: 'cTime',
+      key: 'cTime',
       valueType: 'date',
     },
     {
@@ -155,32 +155,28 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
     key: 'status',
     render: (_, rowData) => {
       const map = {
-        firstFiltration: {
+        [Link.FIRST_FILTRATION]: {
           name: '初筛',
           color: 'orange',
         },
-        departmentFiltration: {
+        [Link.DEPARTMENT_FILTRATION]: {
           name: '用人部门筛选',
           color: 'gold',
         },
-        interview: {
+        [Link.INTERVIEW]: {
           name: '面试',
           color: 'purple',
         },
-        offerCommunication: {
+        [Link.OFFER_COMMUNICATION]: {
           name: 'offer沟通',
           color: 'blue',
         },
-        toBeHired: {
+        [Link.WAIT_FOR_HIRED]: {
           name: '待入职',
           color: 'green',
         },
-        obsolete: {
-          name: '已淘汰',
-          color: 'red',
-        },
       };
-      const { name, color } = rowData.status === 'obsolete' ? map.obsolete : map[rowData.step];
+      const { name, color } = map[rowData.currentLink];
 
       return (
         <Space>
@@ -226,7 +222,7 @@ const renderBadge = (count: number, active = false) => {
 const Candidates: React.FC = () => {
   const history = useHistory();
   const [tabs, setTabs] = useState<Tab[]>([]);
-  const [activeTab, setActiveTab] = useState<React.Key>('all');
+  const [activeTab, setActiveTab] = useState<React.Key>(TabKey.ALL_APPLIED);
   const [columns, setColumns] = useState(getColumns(history, true));
   const [searchValue, setSearchValue] = useState('');
   const [selectedRowsData, setSelectedRowsData] = useState<React.Key[]>([]);
@@ -281,7 +277,6 @@ const Candidates: React.FC = () => {
         // 如果需要转化参数可以在这里进行修改
         const response = await queryCandidates(params);
         const { tableData, tabs: tabsData, success } = response;
-        const data = [...tableData].map((candidate) => formatCandidate(candidate));
 
         generateAndSetTabs(tabsData);
 
@@ -296,7 +291,7 @@ const Candidates: React.FC = () => {
         // };
 
         return {
-          data,
+          data: tableData,
           success,
           total: tableData.length,
         };

@@ -6,30 +6,21 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import styles from './index.scss';
 import { queryCandidate, passCandidates, obsoleteCandidates } from '../../services/candidate';
-import type { Candidate } from '../../models/candidate';
+import { Candidate, Status } from '../../models/candidate';
 
 const { Step } = Steps;
 const { confirm } = Modal;
-const steps = [
-  'firstFiltration',
-  'departmentFiltration',
-  'interview',
-  'offerCommunication',
-  'toBeHired',
-];
 
 const CandidateDetail: React.FC = () => {
   const params = useParams<{ id: string }>();
   const [candidate, setCandidate] = useState<Candidate | Record<string, never>>({});
-  const [curStep, setCurStep] = useState<number>(0);
+  const [hasQuery, setHasQuery] = useState<boolean>(false);
 
   // 获取候选人数据
-  if (!candidate.id)
-    queryCandidate(params.id).then((response) => {
-      const { data } = response;
-
-      setCandidate(data);
-      setCurStep(steps.indexOf(data.step));
+  if (!hasQuery)
+    queryCandidate(params.id).then((res) => {
+      setCandidate(res.data);
+      setHasQuery(true);
     });
 
   const handleClickPass = () => {
@@ -39,12 +30,7 @@ const CandidateDetail: React.FC = () => {
       okText: '是',
       cancelText: '否',
       onOk() {
-        passCandidates([candidate.id]).then((response) => {
-          const { data } = response;
-
-          setCandidate(data[0]);
-          setCurStep(steps.indexOf(data[0].step));
-        });
+        passCandidates([candidate.id]).then((data) => setCandidate(data[0]));
       },
     });
   };
@@ -57,11 +43,7 @@ const CandidateDetail: React.FC = () => {
       okType: 'danger',
       cancelText: '否',
       onOk() {
-        obsoleteCandidates([candidate.id]).then((response) => {
-          const { data } = response;
-
-          setCandidate(data[0]);
-        });
+        obsoleteCandidates([candidate.id]).then((data) => setCandidate(data[0]));
       },
     });
   };
@@ -88,8 +70,8 @@ const CandidateDetail: React.FC = () => {
         <Card colSpan="210px">
           <div className={styles.side}>
             <Steps
-              current={curStep}
-              status={candidate.status === 'obsolete' ? 'error' : 'process'}
+              current={candidate.currentLink - 1}
+              status={candidate.status === Status.OBSOLETE ? 'error' : 'process'}
               direction="vertical"
               className={styles.steps}
             >
@@ -99,7 +81,7 @@ const CandidateDetail: React.FC = () => {
               <Step title="offer沟通" />
               <Step title="待入职" />
             </Steps>
-            {candidate.status !== 'obsolete' && (
+            {candidate.status !== Status.OBSOLETE && (
               <Space direction="vertical">
                 <Button onClick={handleClickPass} type="primary" block>
                   通过
@@ -111,7 +93,7 @@ const CandidateDetail: React.FC = () => {
             )}
           </div>
         </Card>
-        <Card title="简历" className={styles.content}>
+        <Card title="简历" className={styles.content} headerBordered>
           <div className={styles.resumeContainer}>
             <Image src={candidate.resumeUrl} />
           </div>

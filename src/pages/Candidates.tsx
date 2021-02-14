@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, ReactElement } from 'react';
 import Table from '@ant-design/pro-table';
 import { Input, Space, Button, Badge, Tag, Modal } from 'antd';
 import {
@@ -6,11 +6,12 @@ import {
   CheckOutlined,
   CloseOutlined,
   ExclamationCircleOutlined,
+  ScheduleOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'umi';
 import type { History } from 'umi';
-import { queryCandidates, passCandidates, obsoleteCandidates } from '../services/candidate';
-import { Link, TabKey } from '@/models/candidate';
+import { queryCandidates, operateCandidates } from '../services/candidate';
+import { Candidate, Link, Operation, TabKey } from '@/models/candidate';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -38,7 +39,7 @@ const handelClickPass = (candidates, tableActions) => {
     onOk() {
       const ids = candidates.map((item) => item.id);
 
-      passCandidates(ids).then((res) => {
+      operateCandidates(ids, Operation.PASS).then((res) => {
         if (res.success) tableActions.reload();
       });
     },
@@ -55,7 +56,7 @@ const handelClickObsolete = (candidates, tableActions) => {
     onOk() {
       const ids = candidates.map((item) => item.id);
 
-      obsoleteCandidates(ids).then((res) => {
+      operateCandidates(ids, Operation.OBSOLETE).then((res) => {
         if (res.success) tableActions.reload();
       });
     },
@@ -63,16 +64,47 @@ const handelClickObsolete = (candidates, tableActions) => {
 };
 
 // TODO:  判断当前用户是否有权限操作该候选人
-const hasRights = (candidateStep: string, candidateStatus: string) => {
-  // const isHrHaveRights =
-  //   authority.includes('admin') &&
-  //   (candidateStatus === 'firstFiltration' || candidateStatus === 'offerCommunication');
-  // const isInterviewerHaveRights =
-  //   authority.includes('user') &&
-  //   (candidateStatus === 'departmentFiltration' || candidateStatus === 'interview');
+// const hasRights = (candidateStep: string, candidateStatus: string) => {};
 
-  // return isHrHaveRights || isInterviewerHaveRights;
-  return candidateStatus !== 'obsolete';
+const getOperationButtons = (candidate: Candidate, action: any): ReactElement[] => {
+  const buttons: ReactElement[] = [];
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  candidate.operations &&
+    candidate.operations.forEach((operation) => {
+      const props: any = {
+        key: operation,
+        type: 'primary',
+      };
+      let text: string = '';
+
+      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+      switch (operation) {
+        case Operation.PASS:
+          props.icon = <CheckOutlined />;
+          props.onClick = () => handelClickPass([candidate], action);
+          text = '通过';
+          break;
+        case Operation.OBSOLETE:
+          props.danger = true;
+          props.icon = <CloseOutlined />;
+          props.onClick = () => handelClickObsolete([candidate], action);
+          text = '淘汰';
+          break;
+        case Operation.RESCHEDULE:
+          props.icon = <ScheduleOutlined />;
+          text = '改期';
+          break;
+        case Operation.ARRANGE:
+          props.icon = <ScheduleOutlined />;
+          text = '安排';
+          break;
+      }
+
+      buttons.push(<Button {...props}>{text}</Button>);
+    });
+
+  return buttons;
 };
 
 const getColumns = (router: History, includeStatusCol: boolean) => {
@@ -112,40 +144,16 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
       title: '操作',
       valueType: 'option',
       fixed: 'right',
-      render: (_, rowData, __, action) => {
-        const optionDoms = [
-          <Button
-            key="view"
-            icon={<EyeOutlined />}
-            onClick={() => router.push(`/candidate/${rowData.id}`)}
-          >
-            查看
-          </Button>,
-        ];
-
-        if (hasRights(rowData.steps, rowData.status))
-          optionDoms.push(
-            <Button
-              key="pass"
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={() => handelClickPass([rowData], action)}
-            >
-              通过
-            </Button>,
-            <Button
-              key="obsolete"
-              type="primary"
-              icon={<CloseOutlined />}
-              onClick={() => handelClickObsolete([rowData], action)}
-              danger
-            >
-              淘汰
-            </Button>,
-          );
-
-        return optionDoms;
-      },
+      render: (_, rowData, __, action) => [
+        <Button
+          key="view"
+          icon={<EyeOutlined />}
+          onClick={() => router.push(`/candidate/${rowData.id}`)}
+        >
+          查看
+        </Button>,
+        ...getOperationButtons(rowData, action),
+      ],
     },
   ];
   if (!includeStatusCol) return columns;
@@ -177,7 +185,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
         },
       };
       const { name, color } = map[rowData.currentLink];
-
+      console.log(rowData.currentLink, map);
       return (
         <Space>
           <Tag color={color} key={name}>
@@ -225,14 +233,7 @@ const Candidates: React.FC = () => {
   const [activeTab, setActiveTab] = useState<React.Key>(TabKey.ALL_APPLIED);
   const [columns, setColumns] = useState(getColumns(history, true));
   const [searchValue, setSearchValue] = useState('');
-  const [selectedRowsData, setSelectedRowsData] = useState<React.Key[]>([]);
   const refTableActions = useRef<ActionType>();
-
-  const rowSelection = {
-    onChange: (_, selectedRows: any[]) => {
-      setSelectedRowsData(selectedRows);
-    },
-  };
 
   const generateAndSetTabs = (tabsData) => {
     setTabs(
@@ -297,13 +298,6 @@ const Candidates: React.FC = () => {
         };
       }}
       actionRef={refTableActions}
-      rowSelection={
-        activeTab.toString() !== 'all' && activeTab.toString() !== 'obsolete'
-          ? {
-              ...rowSelection,
-            }
-          : false
-      }
       toolbar={{
         menu: {
           type: 'tab',

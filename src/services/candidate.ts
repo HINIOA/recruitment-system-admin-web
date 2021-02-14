@@ -1,5 +1,6 @@
 import { formatCandidate } from '@/utils/dataFormatter';
 import request from '@/utils/request';
+import { Operation } from '@/models/candidate';
 
 export async function queryStatus() {
   return request('/api/tabs');
@@ -25,24 +26,13 @@ export async function queryCandidate(id: string) {
   return res;
 }
 
-export async function passCandidates(ids: string[]) {
+export async function operateCandidates(ids: string[], operation: Operation) {
   const res = await request('/api/candidate/operation', {
     method: 'POST',
     data: {
       ids,
-      operation: 'pass',
+      operation,
     },
   });
-  return res.data;
-}
-
-export async function obsoleteCandidates(ids: string[]) {
-  const res = await request('/api/candidate/operation', {
-    method: 'POST',
-    data: {
-      ids,
-      operation: 'obsolete',
-    },
-  });
-  return res.data;
+  return res;
 }

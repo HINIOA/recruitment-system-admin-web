@@ -30,7 +30,7 @@ interface ActionType {
   cancelEditable: (rowKey: React.Key) => boolean;
 }
 
-const handelClickPass = (candidates, tableActions) => {
+const handleClickPass = (candidates, tableActions) => {
   confirm({
     title: `确认${candidates.map((item) => item.name).join('，')}通过吗？`,
     icon: <ExclamationCircleOutlined />,
@@ -46,7 +46,7 @@ const handelClickPass = (candidates, tableActions) => {
   });
 };
 
-const handelClickObsolete = (candidates, tableActions) => {
+const handleClickObsolete = (candidates, tableActions) => {
   confirm({
     title: `确定淘汰${candidates.map((item) => item.name).join('，')}吗？`,
     icon: <ExclamationCircleOutlined />,
@@ -82,13 +82,13 @@ const getOperationButtons = (candidate: Candidate, action: any): ReactElement[] 
       switch (operation) {
         case Operation.PASS:
           props.icon = <CheckOutlined />;
-          props.onClick = () => handelClickPass([candidate], action);
+          props.onClick = () => handleClickPass([candidate], action);
           text = '通过';
           break;
         case Operation.OBSOLETE:
           props.danger = true;
           props.icon = <CloseOutlined />;
-          props.onClick = () => handelClickObsolete([candidate], action);
+          props.onClick = () => handleClickObsolete([candidate], action);
           text = '淘汰';
           break;
         case Operation.RESCHEDULE:
@@ -329,13 +329,13 @@ const Candidates: React.FC = () => {
         <Space size={16}>
           <Button
             type="link"
-            onClick={() => handelClickPass(selectedRowsData, refTableActions.current)}
+            onClick={() => handleClickPass(selectedRowsData, refTableActions.current)}
           >
             通过
           </Button>
           <Button
             type="link"
-            onClick={() => handelClickObsolete(selectedRowsData, refTableActions.current)}
+            onClick={() => handleClickObsolete(selectedRowsData, refTableActions.current)}
             danger
           >
             淘汰

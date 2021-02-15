@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Select } from 'antd';
+import selectOptions from '../../../../config/selectOptions';
 
 const SearchSelector: React.FC<{
   state: {
@@ -20,44 +21,12 @@ const SearchSelector: React.FC<{
   >([]);
 
   useEffect(() => {
-    if (type === 'types')
-      setOptions([
-        {
-          label: '全职',
-          value: '全职',
-        },
-        {
-          label: '实习',
-          value: '实习',
-        },
-        {
-          label: '研发类',
-          value: '研发类',
-        },
-        {
-          label: '职能类',
-          value: '职能类',
-        },
-      ]);
-    else
-      setOptions([
-        {
-          label: 'A部门',
-          value: 'A部门',
-        },
-        {
-          label: 'B部门',
-          value: 'B部门',
-        },
-        {
-          label: 'C部门',
-          value: 'C部门',
-        },
-        {
-          label: 'D部门',
-          value: 'D部门',
-        },
-      ]);
+    const options: {
+      value: string;
+      label: string;
+    }[] = type === 'types' ? selectOptions.type : selectOptions.department;
+
+    setOptions(options);
   }, [JSON.stringify(state)]);
 
   return (

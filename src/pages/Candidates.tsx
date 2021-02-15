@@ -185,7 +185,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
         },
       };
       const { name, color } = map[rowData.currentLink];
-      console.log(rowData.currentLink, map);
+
       return (
         <Space>
           <Tag color={color} key={name}>

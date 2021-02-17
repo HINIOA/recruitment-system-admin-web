@@ -185,7 +185,7 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
         },
       };
       const { name, color } = map[rowData.currentLink];
-      console.log(rowData.currentLink, map);
+
       return (
         <Space>
           <Tag color={color} key={name}>
@@ -277,7 +277,7 @@ const Candidates: React.FC = () => {
         // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
         // 如果需要转化参数可以在这里进行修改
         const response = await queryCandidates(params);
-        const { tableData, tabs: tabsData, success } = response;
+        const { tableData, tabs: tabsData, success, total } = response;
 
         generateAndSetTabs(tabsData);
 
@@ -294,7 +294,7 @@ const Candidates: React.FC = () => {
         return {
           data: tableData,
           success,
-          total: tableData.length,
+          total,
         };
       }}
       actionRef={refTableActions}

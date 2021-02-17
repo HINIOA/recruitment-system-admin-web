@@ -11,7 +11,7 @@ import {
 import { useHistory } from 'umi';
 import type { History } from 'umi';
 import { queryCandidates, operateCandidates } from '../services/candidate';
-import { Candidate, Link, Operation, TabKey } from '@/models/candidate';
+import { Candidate, Operation, Status, TabKey } from '@/models/candidate';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -163,28 +163,40 @@ const getColumns = (router: History, includeStatusCol: boolean) => {
     key: 'status',
     render: (_, rowData) => {
       const map = {
-        [Link.FIRST_FILTRATION]: {
+        [Status.WAIT_FOR_HR_FILTERED]: {
           name: '初筛',
           color: 'orange',
         },
-        [Link.DEPARTMENT_FILTRATION]: {
+        [Status.WAIT_FOR_DEPARTMENT_FILTERED]: {
           name: '用人部门筛选',
           color: 'gold',
         },
-        [Link.INTERVIEW]: {
-          name: '面试',
+        [Status.WAIT_FOR_ARRANGE_INTERVIEW]: {
+          name: '待安排面试',
           color: 'purple',
         },
-        [Link.OFFER_COMMUNICATION]: {
+        [Status.INVITED]: {
+          name: '已邀约',
+          color: 'cyan',
+        },
+        [Status.BE_REJECTED]: {
+          name: '被拒绝',
+          color: 'red',
+        },
+        [Status.WAIT_FOR_INTERVIEW]: {
+          name: '待面试',
+          color: 'geekblue',
+        },
+        [Status.WAIT_FOR_OFFER_COMMUNICATION]: {
           name: 'offer沟通',
           color: 'blue',
         },
-        [Link.WAIT_FOR_HIRED]: {
+        [Status.WAIT_FOR_HIRED]: {
           name: '待入职',
           color: 'green',
         },
       };
-      const { name, color } = map[rowData.currentLink];
+      const { name, color } = map[rowData.status];
 
       return (
         <Space>

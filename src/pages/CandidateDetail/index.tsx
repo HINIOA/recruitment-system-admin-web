@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { useParams } from 'umi';
 import { Descriptions, Image, Steps, Button, Space, Modal } from 'antd';
 import Card from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  CheckOutlined,
+  CloseOutlined,
+  ExclamationCircleOutlined,
+  ScheduleOutlined,
+} from '@ant-design/icons';
 import styles from './index.scss';
-import { queryCandidate, passCandidates, obsoleteCandidates } from '../../services/candidate';
-import { Candidate, Status } from '../../models/candidate';
+import { queryCandidate, operateCandidates } from '../../services/candidate';
+import { Candidate, Operation, Status } from '../../models/candidate';
 
 const { Step } = Steps;
 const { confirm } = Modal;
@@ -30,7 +35,9 @@ const CandidateDetail: React.FC = () => {
       okText: '是',
       cancelText: '否',
       onOk() {
-        passCandidates([candidate.id]).then((data) => setCandidate(data[0]));
+        operateCandidates([candidate.id], Operation.PASS).then((data) =>
+          setCandidate(data.candidates[0]),
+        );
       },
     });
   };
@@ -43,9 +50,53 @@ const CandidateDetail: React.FC = () => {
       okType: 'danger',
       cancelText: '否',
       onOk() {
-        obsoleteCandidates([candidate.id]).then((data) => setCandidate(data[0]));
+        operateCandidates([candidate.id], Operation.OBSOLETE).then((data) =>
+          setCandidate(data.candidates[0]),
+        );
       },
     });
+  };
+
+  const renderOperationButtons = (): ReactElement[] => {
+    const buttons: ReactElement[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    candidate.operations &&
+      candidate.operations.forEach((operation) => {
+        const props: any = {
+          key: operation,
+          type: 'primary',
+          block: true,
+        };
+        let text: string = '';
+
+        // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+        switch (operation) {
+          case Operation.PASS:
+            props.icon = <CheckOutlined />;
+            props.onClick = handleClickPass;
+            text = '通过';
+            break;
+          case Operation.OBSOLETE:
+            props.danger = true;
+            props.icon = <CloseOutlined />;
+            props.onClick = handleClickObsolete;
+            text = '淘汰';
+            break;
+          case Operation.RESCHEDULE:
+            props.icon = <ScheduleOutlined />;
+            text = '改期';
+            break;
+          case Operation.ARRANGE:
+            props.icon = <ScheduleOutlined />;
+            text = '安排';
+            break;
+        }
+
+        buttons.push(<Button {...props}>{text}</Button>);
+      });
+
+    return buttons;
   };
 
   return (
@@ -82,14 +133,7 @@ const CandidateDetail: React.FC = () => {
               <Step title="待入职" />
             </Steps>
             {candidate.status !== Status.OBSOLETE && (
-              <Space direction="vertical">
-                <Button onClick={handleClickPass} type="primary" block>
-                  通过
-                </Button>
-                <Button onClick={handleClickObsolete} type="primary" block danger>
-                  淘汰
-                </Button>
-              </Space>
+              <Space direction="vertical">{renderOperationButtons()}</Space>
             )}
           </div>
         </Card>

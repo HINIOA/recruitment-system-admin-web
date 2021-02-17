@@ -14,12 +14,13 @@ const ViewModal: React.FC<JobViewModalProps> = (props) => {
   return job ? (
     <Modal
       title="职位详情"
-      centered
+      key={job['_id']}
       visible={visible}
       onOk={onClose}
       onCancel={onClose}
       width={1000}
       footer={null}
+      centered
     >
       <Descriptions bordered>
         <Descriptions.Item label="名称">{job.name}</Descriptions.Item>
@@ -28,9 +29,13 @@ const ViewModal: React.FC<JobViewModalProps> = (props) => {
         <Descriptions.Item label="工作地点">{job.location}</Descriptions.Item>
         <Descriptions.Item label="待招人数">{job.recruitNumber}</Descriptions.Item>
         <Descriptions.Item label="创建时间">
-          {new Date(job.c_time).toLocaleDateString()}
+          {new Date(job.cTime).toLocaleDateString()}
         </Descriptions.Item>
-        <Descriptions.Item label="职位描述">{job.desc}</Descriptions.Item>
+        <Descriptions.Item label="职位描述">
+          {job.description.split('|').map((p) => (
+            <p>{p === ' ' ? '&nbsp;' : p}</p>
+          ))}
+        </Descriptions.Item>
       </Descriptions>
     </Modal>
   ) : null;

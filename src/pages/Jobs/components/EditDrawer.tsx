@@ -8,6 +8,7 @@ import ProForm, {
   ProFormTextArea,
 } from '@ant-design/pro-form';
 import type { FormInstance } from '@ant-design/pro-form';
+import selectOptions from '../../../../config/selectOptions';
 
 interface JobEditDrawer {
   formRef: React.MutableRefObject<FormInstance<any> | undefined> | undefined;
@@ -43,24 +44,7 @@ const EditDrawer: React.FC<JobEditDrawer> = (props) => {
         />
         <ProFormSelect
           width="sm"
-          options={[
-            {
-              value: '研发类',
-              label: '研发类',
-            },
-            {
-              value: '职能类',
-              label: '职能类',
-            },
-            {
-              value: '全职',
-              label: '全职',
-            },
-            {
-              value: '实习',
-              label: '实习',
-            },
-          ]}
+          options={selectOptions.type}
           mode="multiple"
           name="types"
           label="职位类型"
@@ -68,24 +52,7 @@ const EditDrawer: React.FC<JobEditDrawer> = (props) => {
         />
       </ProForm.Group>
       <ProFormRadio.Group
-        options={[
-          {
-            value: 'A部门',
-            label: 'A部门',
-          },
-          {
-            value: 'B部门',
-            label: 'B部门',
-          },
-          {
-            value: 'C部门',
-            label: 'C部门',
-          },
-          {
-            value: 'D部门',
-            label: 'D部门',
-          },
-        ]}
+        options={selectOptions.department}
         width="xl"
         name="department"
         label="所属部门"
@@ -93,24 +60,7 @@ const EditDrawer: React.FC<JobEditDrawer> = (props) => {
       />
       <ProForm.Group>
         <ProFormSelect
-          options={[
-            {
-              value: '广东·深圳市',
-              label: '广东·深圳市',
-            },
-            {
-              value: '北京市',
-              label: '北京市',
-            },
-            {
-              value: '上海市',
-              label: '上海市',
-            },
-            {
-              value: '浙江·杭州市',
-              label: '浙江·杭州市',
-            },
-          ]}
+          options={selectOptions.location}
           width="sm"
           name="location"
           label="工作地点"
@@ -126,7 +76,7 @@ const EditDrawer: React.FC<JobEditDrawer> = (props) => {
       </ProForm.Group>
       <ProFormTextArea
         width="xl"
-        name="desc"
+        name="description"
         label="职位描述"
         rules={[{ required: true, message: '请输入职位描述' }]}
       />

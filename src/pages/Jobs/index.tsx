@@ -18,9 +18,9 @@ import type { Job } from '../../models/job';
 
 const { confirm } = Modal;
 
-let openViewModal;
+let openViewModal: () => void;
 let modalData: Job;
-let openFormDrawer;
+let openFormDrawer: () => void;
 let formType: 'create' | 'edit';
 
 const handleClickView = (job) => {
@@ -64,7 +64,7 @@ const columns: ProColumns[] = [
   {
     title: '部门',
     dataIndex: 'department',
-    renderFormItem: (item, { type, defaultRender, ...rest }) => {
+    renderFormItem: (_, { type, defaultRender, ...rest }) => {
       return (
         <SearchSelector
           {...rest}
@@ -111,8 +111,8 @@ const columns: ProColumns[] = [
   },
   {
     title: '创建时间',
-    key: 'c_time',
-    dataIndex: 'c_time',
+    key: 'cTime',
+    dataIndex: 'cTime',
     valueType: 'date',
     search: false,
   },
@@ -156,6 +156,7 @@ const renderFormDrawer = ({ job, formRef, visible, setVisible, tableActionRef })
 
   return (
     <EditDrawer
+      key={job['_id']}
       formRef={formRef}
       formType={formType}
       visible={visible}
@@ -164,17 +165,17 @@ const renderFormDrawer = ({ job, formRef, visible, setVisible, tableActionRef })
         const newJob = { ...value };
 
         if (formType === 'create') {
-          newJob['c_time'] = new Date();
+          newJob['cTime'] = new Date();
         } else {
           Object.keys(job).forEach((key) => {
             if (!newJob[key]) newJob[key] = job[key];
           });
         }
 
-        const { isSuccess, message: messageText } =
+        const { success, message: messageText } =
           formType === 'create' ? await addJob(newJob) : await updateJob(newJob);
 
-        if (isSuccess) {
+        if (success) {
           tableActionRef.current.reload();
           message.success(messageText);
           return true;
@@ -187,7 +188,7 @@ const renderFormDrawer = ({ job, formRef, visible, setVisible, tableActionRef })
 };
 
 const Jobs: React.FC = () => {
-  const actionRef = useRef<ActionType>();
+  const actionRef = useRef<ActionType>(null);
   const formRef = useRef<React.MutableRefObject<FormInstance<any> | undefined>>();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
@@ -203,12 +204,12 @@ const Jobs: React.FC = () => {
     <>
       <ProTable<Job>
         headerTitle="职位列表"
-        rowKey="id"
+        rowKey="_id"
         columns={columns}
         actionRef={actionRef}
         request={async (params = {}) => {
           const { data } = await queryJobs(params);
-          console.log('table data', data);
+
           return {
             data,
             success: true,
@@ -220,7 +221,6 @@ const Jobs: React.FC = () => {
         form={{
           // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
           syncToUrl: (values, type) => {
-            console.log('syncToUrl', values, type);
             if (type === 'get') {
               return {
                 ...values,
@@ -231,23 +231,25 @@ const Jobs: React.FC = () => {
         }}
         options={false}
         toolBarRender={() => [
-          <Button key="primary" type="primary" icon={<PlusOutlined />} onClick={handleClickCreate}>
+          <Button key="primary" type="dashed" icon={<PlusOutlined />} onClick={handleClickCreate}>
             创建职位招聘
           </Button>,
         ]}
         pagination={{
+          defaultPageSize: 10,
           position: ['bottomCenter'],
         }}
         dateFormatter="string"
       />
       <ViewModal visible={modalVisible} job={modalData} onClose={() => setModalVisible(false)} />
-      {renderFormDrawer({
-        job: editingJob,
-        formRef,
-        visible: drawerVisible,
-        setVisible: setDrawerVisible,
-        tableActionRef: actionRef,
-      })}
+      {editingJob &&
+        renderFormDrawer({
+          job: editingJob,
+          formRef,
+          visible: drawerVisible,
+          setVisible: setDrawerVisible,
+          tableActionRef: actionRef,
+        })}
     </>
   );
 };

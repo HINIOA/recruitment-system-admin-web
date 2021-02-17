@@ -1,9 +1,9 @@
 export interface Job {
-  id: string;
+  _id: string;
   name: string;
   department: string;
-  desc: string;
-  c_time: string;
+  description: string;
+  cTime: string;
   p_time?: Date;
   location: string;
   types: string[];

@@ -2,7 +2,7 @@ import type { MenuDataItem } from '@ant-design/pro-layout';
 import { getMenuData, getPageTitle } from '@ant-design/pro-layout';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import type { ConnectProps } from 'umi';
-import { Link, SelectLang, connect } from 'umi';
+import { Link, connect } from 'umi';
 import React from 'react';
 import type { ConnectState } from '@/models/connect';
 import logo from '../assets/logo.svg';
@@ -40,9 +40,6 @@ const UserLayout: React.FC<UserLayoutProps> = (props) => {
       </Helmet>
 
       <div className={styles.container}>
-        <div className={styles.lang}>
-          <SelectLang />
-        </div>
         <div className={styles.content}>
           <div className={styles.top}>
             <div className={styles.header}>

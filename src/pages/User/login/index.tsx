@@ -63,7 +63,7 @@ const Login: React.FC<LoginProps> = (props) => {
         }}
       >
         {status === 'error' && loginType === 'account' && !submitting && (
-          <LoginMessage content="账户或密码错误（123456)" />
+          <LoginMessage content="用户名或密码错误" />
         )}
         <ProFormText
           name="userName"
@@ -71,7 +71,7 @@ const Login: React.FC<LoginProps> = (props) => {
             size: 'large',
             prefix: <UserOutlined className={styles.prefixIcon} />,
           }}
-          placeholder="用户名: admin or user"
+          placeholder="请输入用户名（姓名）"
           rules={[
             {
               required: true,
@@ -85,7 +85,7 @@ const Login: React.FC<LoginProps> = (props) => {
             size: 'large',
             prefix: <LockTwoTone className={styles.prefixIcon} />,
           }}
-          placeholder="密码: 123456"
+          placeholder="请输入密码"
           rules={[
             {
               required: true,

@@ -77,6 +77,7 @@ const columns: ProColumns[] = [
         type="link"
         icon={<EditOutlined />}
         onClick={() => handleClickEdit(rowData)}
+        style={{ padding: 0 }}
       >
         编辑
       </Button>,
@@ -179,7 +180,7 @@ const Interviewers: React.FC = () => {
       >
         <Form labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} form={form}>
           <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
-            <Input disabled={formType === 'edit'} />
+            <Input disabled={formType === 'edit'} placeholder="请输入姓名" />
           </Form.Item>
           <Form.Item name="department" label="部门" rules={[{ required: true }]}>
             <Select placeholder="请选择部门" allowClear>

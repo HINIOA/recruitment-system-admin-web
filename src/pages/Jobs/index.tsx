@@ -121,12 +121,18 @@ const columns: ProColumns[] = [
     valueType: 'option',
     fixed: 'right',
     render: (_, rowData, __, action) => [
-      <Button key="view" icon={<EyeOutlined />} onClick={() => handleClickView(rowData)}>
+      <Button
+        key="view"
+        type="text"
+        style={{ paddingLeft: 0 }}
+        icon={<EyeOutlined />}
+        onClick={() => handleClickView(rowData)}
+      >
         查看
       </Button>,
       <Button
         key="edit"
-        type="primary"
+        type="link"
         icon={<EditOutlined />}
         onClick={() => handleClickEdit(rowData)}
       >
@@ -134,7 +140,7 @@ const columns: ProColumns[] = [
       </Button>,
       <Button
         key="delete"
-        type="primary"
+        type="link"
         icon={<DeleteOutlined />}
         onClick={() => handleClickDelete(rowData, action)}
         danger
@@ -156,7 +162,7 @@ const renderFormDrawer = ({ job, formRef, visible, setVisible, tableActionRef })
 
   return (
     <EditDrawer
-      key={job['_id']}
+      key={job ? job['_id'] : Date.now()}
       formRef={formRef}
       formType={formType}
       visible={visible}
@@ -231,7 +237,7 @@ const Jobs: React.FC = () => {
         }}
         options={false}
         toolBarRender={() => [
-          <Button key="primary" type="dashed" icon={<PlusOutlined />} onClick={handleClickCreate}>
+          <Button key="create" type="primary" icon={<PlusOutlined />} onClick={handleClickCreate}>
             创建职位招聘
           </Button>,
         ]}
@@ -242,7 +248,7 @@ const Jobs: React.FC = () => {
         dateFormatter="string"
       />
       <ViewModal visible={modalVisible} job={modalData} onClose={() => setModalVisible(false)} />
-      {editingJob &&
+      {formType &&
         renderFormDrawer({
           job: editingJob,
           formRef,

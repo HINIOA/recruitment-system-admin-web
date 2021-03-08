@@ -36,3 +36,15 @@ export async function operateCandidates(ids: string[], operation: Operation) {
   });
   return res;
 }
+
+export async function arrangeInterview(ids: string[], interviewTime: Date) {
+  const res = await request('/api/candidate/operation', {
+    method: 'POST',
+    data: {
+      ids,
+      operation: Operation.ARRANGE,
+      interviewTime,
+    },
+  });
+  return res;
+}

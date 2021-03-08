@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import React, { useState, useRef, ReactElement } from 'react';
 import Table from '@ant-design/pro-table';
 import { Input, Space, Button, Badge, Tag, Modal } from 'antd';
@@ -14,6 +15,7 @@ import type { History } from 'umi';
 import { queryCandidates, operateCandidates } from '../../services/candidate';
 import { Candidate, Operation, Status, TabKey } from '@/models/candidate';
 import SelectInterviewerDialog from './components/SelectInterviewerDialog';
+import ArrangeInterviewDialog from './components/ArrangeInterviewDialog';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -33,6 +35,8 @@ interface ActionType {
 }
 
 let openSelectInterviewerDialog: () => void;
+let openArrangeInterviewDialog: () => void;
+let selectedCandidateId: string;
 
 const handleClickPass = (candidates, tableActions) => {
   confirm({
@@ -67,9 +71,13 @@ const handleClickObsolete = (candidates, tableActions) => {
   });
 };
 
-const handleClickAppointInterviewer = (candidate, tableActions) => {
-  console.log(candidate, tableActions);
+const handleClickAppointInterviewer = (candidate) => {
+  console.log(candidate);
   openSelectInterviewerDialog();
+};
+const handleClickArrangeInterview = (candidate) => {
+  selectedCandidateId = candidate._id;
+  openArrangeInterviewDialog();
 };
 
 const getOperationButtons = (candidate: Candidate, action: any): ReactElement[] => {
@@ -104,11 +112,11 @@ const getOperationButtons = (candidate: Candidate, action: any): ReactElement[] 
         case Operation.ARRANGE:
           props.icon = <ScheduleOutlined />;
           text = '安排';
-          // props.onClick = () => handleClickArrangeInterviewer([candidate], action);
+          props.onClick = () => handleClickArrangeInterview(candidate);
           break;
         case Operation.APPOINT_INTERVIEWER:
           props.icon = <UserAddOutlined />;
-          props.onClick = () => handleClickAppointInterviewer(candidate, action);
+          props.onClick = () => handleClickAppointInterviewer(candidate);
           text = '安排';
           break;
       }
@@ -262,9 +270,11 @@ const Candidates: React.FC = () => {
   const [columns, setColumns] = useState(getColumns(history, true));
   const [searchValue, setSearchValue] = useState('');
   const [selectInterviewerVisible, setSelectInterviewerVisible] = useState(false);
+  const [arrangeInterviewVisible, setArrangeInterviewVisible] = useState(false);
   const refTableActions = useRef<ActionType>();
 
   openSelectInterviewerDialog = () => setSelectInterviewerVisible(true);
+  openArrangeInterviewDialog = () => setArrangeInterviewVisible(true);
 
   const generateAndSetTabs = (tabsData) => {
     setTabs(
@@ -379,6 +389,17 @@ const Candidates: React.FC = () => {
           isVisible={selectInterviewerVisible}
           onOk={() => setSelectInterviewerVisible(false)}
           onCancel={() => setSelectInterviewerVisible(false)}
+        />
+      )}
+      {arrangeInterviewVisible && (
+        <ArrangeInterviewDialog
+          visible={arrangeInterviewVisible}
+          candidateId={selectedCandidateId}
+          onOk={() => {
+            setArrangeInterviewVisible(false);
+            refTableActions.current?.reload();
+          }}
+          onCancel={() => setArrangeInterviewVisible(false)}
         />
       )}
     </>
